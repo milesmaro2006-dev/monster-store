@@ -1,0 +1,16 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}الحساب وكلمة المرور{% endblock %}
+{% block content %}
+<section class="password-change-panel panel">
+<form method="post" class="password-change-form">
+  {{ form.hidden_tag() }}
+  <header><p class="eyebrow">إعدادات الحساب</p><h1>الملف الشخصي والأمان</h1></header>
+  <p>حدّث اسم المستخدم وكلمة المرور مع بقاء جلستك الحالية مفتوحة.</p>
+  <label for="{{ form.username.id }}">{{ form.username.label }} {{ form.username(class="input", autocomplete="username", required=True) }}{% for e in form.username.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+  <label for="{{ form.current_password.id }}">{{ form.current_password.label }} {{ form.current_password(class="input", autocomplete="current-password", required=True) }}{% for e in form.current_password.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+  <label for="{{ form.new_password.id }}">{{ form.new_password.label }} {{ form.new_password(class="input", autocomplete="new-password", required=True) }}{% for e in form.new_password.errors %}<span class="err">{{ e }}</span>{% endfor %}<small>12 حرفاً على الأقل.</small></label>
+  <label for="{{ form.confirm_password.id }}">{{ form.confirm_password.label }} {{ form.confirm_password(class="input", autocomplete="new-password", required=True) }}{% for e in form.confirm_password.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+  <button type="submit" class="btn btn-primary btn-block">حفظ بيانات الحساب</button>
+</form>
+</section>
+{% endblock %}

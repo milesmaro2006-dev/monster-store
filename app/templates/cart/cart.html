@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ t('cart_title') }} — IMPORT DISTRICT{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="section"><div class="container cart-page">
+  <h1 class="section-title">{{ t('cart_title') }}</h1>
+  {% if items %}<div class="cart-wrap">
+    <div class="cart-items" aria-label="{{ t('cart_title') }}">
+      {% for it in items %}{% include 'cart/_cart_row.html' %}{% endfor %}
+      <form action="{{ url_for('cart.clear') }}" method="post" class="clear-cart">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost btn-sm">{{ t('clear_cart') }}</button>
+      </form>
+    </div>
+    <aside class="cart-summary" data-cart-summary
+           data-shipping-url="{{ url_for('cart.set_shipping_method') }}"
+           data-metro-fee="{{ '%.2f'|format(metro_delivery_fee) }}"
+           data-home-fee="{{ '%.2f'|format(home_delivery_fee) }}">
+      <h2>{{ t('order_summary') }}</h2>
+      <p><span>{{ t('subtotal') }}</span><b data-subtotal="{{ '%.2f'|format(subtotal) }}">{{ '%.2f'|format(subtotal) }} {{ t('egp') }}</b></p>
+      <h3>{{ t('shipping_method') }}</h3>
+      <form data-shipping-form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="shipping-choice"><input type="radio" name="delivery_method" value="metro_pickup" data-shipping-choice {% if delivery_method == 'metro_pickup' %}checked{% endif %}> <span>{{ t('metro_pickup') }}<small>{{ '%.2f'|format(metro_delivery_fee) }} {{ t('egp') }}</small></span></label>
+        <label class="shipping-choice"><input type="radio" name="delivery_method" value="home_delivery" data-shipping-choice {% if delivery_method == 'home_delivery' %}checked{% endif %}> <span>{{ t('home_delivery') }}<small>{{ '%.2f'|format(home_delivery_fee) }} {{ t('egp') }}</small></span></label>
+      </form>
+      <p><span data-shipping-label>{{ t('shipping_fee') }}</span><b data-shipping-fee>{{ '%.2f'|format(delivery_fee) }} {{ t('egp') }}</b></p>
+      <p class="total"><span>{{ t('line_total') }}</span><b data-total aria-live="polite">{{ '%.2f'|format(total) }} {{ t('egp') }}</b></p>
+      <p class="shipping-status" data-shipping-status role="status" aria-live="polite"></p>
+      <p class="muted">{{ t('cart_shipping_note') }}</p>
+      <a href="{{ url_for('checkout.checkout') }}" class="btn btn-primary btn-block">{{ t('checkout') }}</a>
+    </aside>
+  </div>
+  {% else %}<p class="empty">{{ t('empty_cart') }} <a href="{{ url_for('storefront.catalog') }}">{{ t('browse_products') }}</a></p>{% endif %}
+</div></section>
+{% endblock %}

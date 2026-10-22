@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}{{ product|product_name }} — IMPORT DISTRICT{% endblock %}
+{% block content %}
+<section class="section product-detail">
+  <div class="container detail-grid">
+    <div class="detail-img" aria-label="{{ product|product_name }}">
+      <picture>
+        {% set webp_image = product_image_webp(product) %}
+        {% if webp_image %}<source srcset="{{ webp_image }}" type="image/webp">{% endif %}
+        <img src="{{ product_image(product) }}" alt="{{ product|product_name }}" width="800" height="800" decoding="async" fetchpriority="high" data-fallback="{{ placeholder_image }}">
+      </picture>
+      <span class="detail-image-glow" aria-hidden="true"></span>
+    </div>
+    <div class="detail-info">
+      {% if product.brand %}<span class="detail-brand">{{ product.brand }}</span>{% endif %}
+      <h1>{{ product|product_name }}</h1>
+      {% if product.is_zero_sugar %}<span class="badge badge-zero-sugar zero-sugar-detail">⚡ {{ 'Zero Sugar' if current_lang == 'en' else 'خالي من السكر / Zero Sugar' }}</span>{% endif %}
+      {% if product.tags %}<div class="detail-flavor-tags" aria-label="{{ 'Flavor tags' if current_lang == 'en' else 'وسوم النكهة' }}">{% for tag in product.tags %}<a href="{{ url_for('storefront.catalog', flavor_tag=tag.slug) }}">#{{ tag.name_en if current_lang == 'en' else tag.name_ar }}</a>{% endfor %}</div>{% elif product.flavor or product.flavor_en %}<p class="detail-flavor"><span>{{ t('flavor_prefix') }}</span> {{ product|product_flavor }}</p>{% endif %}
+      <p class="stock-line detail-stock {% if product.in_stock %}stock-available{% else %}stock-unavailable{% endif %}" role="status">
+        <span class="stock-dot" aria-hidden="true"></span>
+        {% if product.in_stock %}{{ t('available') }} · {{ t('available_quantity') }} {{ product.stock }}{% else %}{{ t('not_available') }}{% endif %}
+      </p>
+      {% if product.stock > 0 and product.stock <= 5 %}<p class="badge badge-scarcity scarcity-detail">{{ 'Only ' ~ product.stock ~ ' left in stock!' if current_lang == 'en' else 'متبقي ' ~ product.stock ~ ' قطع فقط في المخزن!' }}</p>{% endif %}
+      <p class="detail-price"><span>{{ '%.2f'|format(product.price) }}</span><bdi>{{ t('egp') }}</bdi></p>
+      <div class="product-specs" aria-label="{{ 'Product specifications' if current_lang == 'en' else 'مواصفات المنتج' }}">
+        <div class="product-spec"><span>{{ 'Volume / weight' if current_lang == 'en' else 'الحجم / الوزن' }}</span><b>{{ product.volume or '—' }}</b></div>
+        <div class="product-spec"><span>{{ 'Country of origin' if current_lang == 'en' else 'بلد المنشأ' }}</span><b>{{ product.origin_country or '—' }}</b></div>
+        <div class="product-spec"><span>{{ 'Calories' if current_lang == 'en' else 'السعرات' }}</span><b>{{ product.calories or '—' }}</b></div>
+        <div class="product-spec"><span>{{ 'Serving advice' if current_lang == 'en' else 'طريقة التقديم' }}</span><b>{{ product.serving_advice or 'يُقدّم مثلجاً' }}</b></div>
+      </div>
+      {% if product.description or product.description_en %}<p class="detail-description">{{ product|product_desc }}</p>{% endif %}
+      {% if product.in_stock %}
+      <form action="{{ url_for('cart.add', product_id=product.id) }}" method="post" class="detail-add-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="qty-detail">{{ t('quantity') }}</label>
+        <div class="quantity-picker">
+          <button type="button" data-quantity-step="-1" aria-label="{{ 'Decrease quantity' if current_lang == 'en' else 'تقليل الكمية' }}">−</button>
+          <input id="qty-detail" type="number" name="qty" value="1" min="1" max="{{ product.stock }}" inputmode="numeric" required>
+          <button type="button" data-quantity-step="1" aria-label="{{ 'Increase quantity' if current_lang == 'en' else 'زيادة الكمية' }}">+</button>
+        </div>
+        <button type="submit" class="btn btn-primary detail-add-button">{{ t('add_to_cart') }}</button>
+      </form>
+      {% else %}<p class="badge badge-out badge-static">{{ t('out_of_stock_detail') }}</p>{% endif %}
+    </div>
+  </div>
+  {% if related %}<div class="container related-products"><h2 class="section-title">{{ t('related_products') }}</h2><div class="product-grid">{% for p in related %}{% include 'storefront/_product_card.html' %}{% endfor %}</div></div>{% endif %}
+</section>
+{% endblock %}

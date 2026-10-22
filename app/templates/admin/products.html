@@ -1,0 +1,12 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}المنتجات{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">IMPORT DISTRICT / ADMIN</p><h1>المنتجات</h1><p class="muted">إدارة المجموعة والأسعار والمخزون.</p></div><a class="btn btn-primary" href="{{ url_for('admin.portal_product_new') }}">＋ أضف منتج</a></header>
+<div class="admin-product-grid">
+{% for p in products %}<article class="admin-product-card">
+  <div class="admin-product-image">{% if p.image_url %}<img src="{{ url_for('static', filename=p.image_url) }}" alt="{{ p.name }}" loading="lazy">{% else %}<span aria-hidden="true">◈</span>{% endif %}</div>
+  <div class="admin-product-info"><h2>{{ p.name }}</h2>{% if p.brand %}<p class="muted">{{ p.brand }}</p>{% endif %}<p>{{ p.description or '—' }}</p><form class="admin-product-inline" method="post" action="{{ url_for('admin.portal_product_quick_update', product_id=p.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>السعر EGP<input type="number" name="price" min="0" step="0.01" value="{{ '%.2f'|format(p.price) }}" required></label><label>المخزون<input type="number" name="stock" min="0" step="1" value="{{ p.stock }}" required></label><button type="submit" class="btn btn-ghost btn-sm">حفظ السعر والمخزون</button></form><div class="admin-product-actions"><a class="btn btn-ghost btn-sm" href="{{ url_for('admin.portal_product_edit', product_id=p.id) }}">تعديل</a><form method="post" action="{{ url_for('admin.portal_product_delete', product_id=p.id) }}" onsubmit="return confirm('هل تريد حذف هذا المنتج؟')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-danger btn-sm">حذف</button></form></div></div>
+</article>{% else %}<div class="admin-empty"><h2>لا توجد منتجات بعد</h2><p>أضف أول منتج لبدء المجموعة.</p><a class="btn btn-primary" href="{{ url_for('admin.portal_product_new') }}">＋ أضف منتج</a></div>{% endfor %}
+</div>
+{% if pagination and pagination.pages > 1 %}<nav class="pagination">{% if pagination.has_prev %}<a href="{{ url_for('admin.portal_products_list', page=pagination.prev_num) }}">السابق</a>{% endif %}<span>صفحة {{ pagination.page }} من {{ pagination.pages }}</span>{% if pagination.has_next %}<a href="{{ url_for('admin.portal_products_list', page=pagination.next_num) }}">التالي</a>{% endif %}</nav>{% endif %}
+{% endblock %}

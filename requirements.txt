@@ -1,0 +1,16 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Flask-Migrate
+Flask-WTF
+Flask-Login
+Flask-Limiter
+Flask-Babel
+WTForms
+email-validator
+python-dotenv
+Werkzeug
+Pillow
+gunicorn
+redis
+pytz

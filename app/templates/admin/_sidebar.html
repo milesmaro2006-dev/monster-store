@@ -1,0 +1,13 @@
+<aside class="sidebar" id="admin-nav">
+  <a class="brand" href="{{ url_for('admin.portal_products_list') }}"><span class="brand-mark">ID</span><span>IMPORT<br><small>DISTRICT ADMIN</small></span></a>
+  <nav aria-label="التنقل الإداري">
+    <a href="{{ url_for('admin.portal_products_list') }}">▤ <span>المنتجات</span></a>
+    <a href="{{ url_for('admin.portal_categories') }}">▧ <span>الفئات</span></a>
+    <a href="{{ url_for('admin.portal_orders_list') }}">▣ <span>الطلبات</span></a>
+    <a href="{{ url_for('admin.portal_store_settings') }}">⚙ <span>الإعدادات</span></a>
+  </nav>
+  <form action="{{ url_for('admin.portal_logout') }}" method="post" class="logout">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-ghost btn-block" type="submit">تسجيل الخروج</button>
+  </form>
+</aside>

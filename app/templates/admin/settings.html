@@ -1,0 +1,34 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}الإعدادات{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">IMPORT DISTRICT / ADMIN</p><h1>الإعدادات</h1><p class="muted">تحديث بيانات الدخول وإعدادات المتجر.</p></div></header>
+<section class="panel account-settings-panel"><h2>الحساب والأمان</h2><p class="muted">أدخل كلمة المرور الحالية لتحديث اسم المستخدم وكلمة المرور. ستظل جلستك مفتوحة.</p>
+<form method="post" action="{{ url_for('admin.portal_store_settings') }}" class="admin-settings-form">{{ account_form.hidden_tag() }}<input type="hidden" name="form_type" value="account">
+<label>{{ account_form.username.label }}{{ account_form.username(class="input", autocomplete="username", required=True) }}{% for e in account_form.username.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ account_form.current_password.label }}{{ account_form.current_password(class="input", autocomplete="current-password", required=True) }}{% for e in account_form.current_password.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ account_form.new_password.label }}{{ account_form.new_password(class="input", autocomplete="new-password", required=False) }}<small class="muted">اتركه فارغاً إذا كنت تريد تغيير اسم المستخدم فقط. عند تغييره يجب ألا يقل عن 12 حرفاً.</small>{% for e in account_form.new_password.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ account_form.confirm_password.label }}{{ account_form.confirm_password(class="input", autocomplete="new-password", required=False) }}{% for e in account_form.confirm_password.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<button class="btn btn-primary" type="submit">حفظ بيانات الدخول</button></form></section>
+<form method="post" action="{{ url_for('admin.portal_store_settings') }}" class="admin-settings-form store-settings-form">{{ form.hidden_tag() }}<input type="hidden" name="form_type" value="store">
+<section class="panel settings-section"><h2>معلومات التواصل</h2><div class="settings-fields">
+<label>{{ form.contact_phone.label }}{{ form.contact_phone(class="input", inputmode="tel", autocomplete="tel") }}{% for e in form.contact_phone.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ form.contact_whatsapp.label }}{{ form.contact_whatsapp(class="input", inputmode="tel") }}{% for e in form.contact_whatsapp.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ form.contact_email.label }}{{ form.contact_email(class="input", type="email", autocomplete="email") }}{% for e in form.contact_email.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ form.store_address.label }}{{ form.store_address(class="input", autocomplete="street-address") }}{% for e in form.store_address.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+</div></section>
+<section class="panel settings-section"><h2>وسائل الدفع وإنستاباي</h2><div class="settings-fields">
+<label>{{ form.instapay_address.label }}{{ form.instapay_address(class="input", dir="ltr") }}</label>
+<label>{{ form.instapay_name.label }}{{ form.instapay_name(class="input") }}</label>
+<label class="settings-wide">{{ form.payment_instructions.label }}{{ form.payment_instructions(class="input", rows="4") }}</label>
+</div></section>
+<section class="panel settings-section"><h2>روابط السوشيال ميديا</h2><div class="settings-fields">
+<label>{{ form.facebook_url.label }}{{ form.facebook_url(class="input", type="url", dir="ltr", placeholder="https://facebook.com/...") }}{% for e in form.facebook_url.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ form.instagram_url.label }}{{ form.instagram_url(class="input", type="url", dir="ltr", placeholder="https://instagram.com/...") }}{% for e in form.instagram_url.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+<label>{{ form.tiktok_url.label }}{{ form.tiktok_url(class="input", type="url", dir="ltr", placeholder="https://tiktok.com/@...") }}{% for e in form.tiktok_url.errors %}<small class="text-danger">{{ e }}</small>{% endfor %}</label>
+</div></section>
+<section class="panel settings-section"><h2>رسوم التوصيل</h2><div class="settings-fields">
+<label>{{ form.metro_pickup_fee.label }}{{ form.metro_pickup_fee(class="input", min="0", step="0.01") }}</label><label>{{ form.home_delivery_fee.label }}{{ form.home_delivery_fee(class="input", min="0", step="0.01") }}</label><label>{{ form.default_delivery_fee.label }}{{ form.default_delivery_fee(class="input") }}</label><label>{{ form.free_delivery_threshold.label }}{{ form.free_delivery_threshold(class="input") }}</label>
+</div><button class="btn btn-primary" type="submit">حفظ إعدادات المتجر</button></section>
+</form>
+<style>.settings-section{margin:1rem 0;padding:1.25rem;border:1px solid #202736;background:#13161c}.settings-section h2{margin:0 0 1rem}.settings-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.settings-fields label{display:grid;gap:.45rem}.settings-wide{grid-column:1/-1}.settings-fields input,.settings-fields textarea{width:100%;letter-spacing:normal!important;font-family:Cairo,sans-serif}@media(max-width:680px){.settings-fields{grid-template-columns:1fr}.settings-wide{grid-column:auto}}</style>
+{% endblock %}

@@ -1,0 +1,14 @@
+<!-- Admin login -->
+{% extends 'admin/base_admin.html' %}
+{% block title %}دخول الأدمن{% endblock %}
+{% block auth_content %}
+<div class="login-wrap">
+  <form method="post" class="login-form">
+    {{ form.hidden_tag() }}
+    <p class="eyebrow">IMPORT DISTRICT</p><h1>بوابة إدارة المتجر</h1><p class="muted">سجّل الدخول لإدارة المنتجات والطلبات.</p>
+    <label>{{ form.username.label }} {{ form.username(class="input") }}</label>
+    <label>{{ form.password.label }} {{ form.password(class="input") }}</label>
+    <button type="submit" class="btn btn-primary btn-block">دخول</button>
+  </form>
+</div>
+{% endblock %}

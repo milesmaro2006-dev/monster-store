@@ -1,0 +1,27 @@
+<!-- Categories -->
+{% extends 'admin/base_admin.html' %}
+{% block title %}الفئات{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">IMPORT DISTRICT / CATALOG</p><h1>الفئات</h1><p class="muted">إدارة أقسام المتجر وتسميات العرض بالعربية والإنجليزية.</p></div></header>
+<section class="panel category-create-panel">
+  <h2>إضافة فئة</h2>
+  <form method="post" class="admin-settings-form category-create-form">
+    {{ form.hidden_tag() }}
+    <label>{{ form.name.label }} {{ form.name(class="input", placeholder="مثال: مشروبات طاقة ومستوردة") }}</label>
+    <label>{{ form.name_en.label }} {{ form.name_en(class="input", placeholder="Imported Energy Drinks", dir="ltr") }}</label>
+    <label class="category-active-check">{{ form.is_active() }} {{ form.is_active.label }}</label>
+    <button class="btn btn-primary" type="submit">إضافة فئة</button>
+  </form>
+</section>
+<section class="panel category-list-panel">
+  <div class="category-list-heading"><h2>أقسام المتجر</h2><span class="status status-shipped">{{ categories|length }} فئة</span></div>
+  <div class="orders-table-wrap"><table class="table category-table"><thead><tr><th>اسم الفئة بالعربية</th><th>Category name (EN)</th><th>المنتجات المرتبطة</th><th>الإجراءات</th></tr></thead><tbody>
+    {% for row in categories %}{% set c = row.category %}<tr>
+      <td><strong>{{ c.name_ar }}</strong><small class="category-slug">{{ c.slug }}</small></td>
+      <td dir="ltr">{{ c.name_en or '—' }}</td>
+      <td><span class="category-product-count">{{ row.product_count }}</span></td>
+      <td><div class="category-row-actions"><a class="btn btn-ghost btn-sm" href="{{ url_for('admin.portal_category_edit', category_id=c.id) }}">تعديل</a><form method="post" action="{{ url_for('admin.portal_category_delete', category_id=c.id) }}" onsubmit="return confirm('هل تريد حذف هذه الفئة؟')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger btn-sm" type="submit">حذف</button></form></div></td>
+    </tr>{% else %}<tr><td colspan="4" class="orders-empty">لا توجد فئات حتى الآن.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

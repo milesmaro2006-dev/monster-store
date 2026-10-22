@@ -1,0 +1,36 @@
+<!-- Order detail -->
+{% extends 'admin/base_admin.html' %}
+{% block title %}طلب {{ order.reference }}{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">ORDER DETAIL</p><h1>طلب <bdi>#{{ order.reference }}</bdi></h1><p class="muted">تاريخ الإنشاء: <bdi>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</bdi></p></div>{% if whatsapp_url %}<a class="btn btn-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">التواصل عبر واتساب</a>{% endif %}</header>
+<section class="panel"><h2>بيانات العميل والتوصيل</h2><div class="order-facts"><p><small>العميل</small><strong>{{ order.customer_name }}</strong></p><p><small>الهاتف</small><bdi>{{ order.phone }}</bdi></p><p><small>طريقة التوصيل</small><strong>{{ 'استلام من محطة مترو' if order.delivery_method == 'metro_pickup' else 'توصيل للمنزل' }}</strong></p><p><small>المحافظة / المنطقة</small><strong>{{ order.governorate }} / {{ order.area }}</strong></p><p class="wide"><small>العنوان / المحطة</small><strong>{{ order.address|replace('\n', '، ') }}</strong></p><p><small>طريقة الدفع</small><strong>{{ {'cod':'الدفع عند الاستلام','instapay':'إنستاباي / محفظة','vodafone_cash':'فودافون كاش'}.get(order.payment_method, order.payment_method) }}</strong></p><p><small>حالة الطلب</small><span class="status status-{{ order.status }}">{{ order.status_label_ar }}</span></p></div>{% if order.notes %}<p>ملاحظات: {{ order.notes }}</p>{% endif %}</section>
+
+<h2>المنتجات</h2>
+<table class="table">
+  <thead><tr><th>المنتج عند الشراء</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>
+  {% for it in items %}
+    <tr>
+      <td>{{ it.product_name }}{% if it.brand_snapshot %}<br><small>{{ it.brand_snapshot }}</small>{% endif %}</td>
+      <td>{{ '%.2f'|format(it.unit_price) }}</td>
+      <td>{{ it.quantity }}</td>
+      <td>{{ '%.2f'|format(it.line_total) }}</td>
+    </tr>
+  {% endfor %}</tbody>
+</table>
+<p>الفرعي: {{ '%.2f'|format(order.subtotal) }} | التوصيل: {{ '%.2f'|format(order.delivery_fee) }} | <b>الإجمالي: {{ '%.2f'|format(order.total) }}</b></p>
+
+<h2>تحديث الحالة</h2>
+<form method="post" class="inline">
+  {{ form.hidden_tag() }}
+  {{ form.status(class="input") }}
+  {{ form.note(class="input", placeholder="ملاحظة (اختياري)") }}
+  <button class="btn btn-primary btn-sm">حفظ</button>
+</form>
+
+<h2>سجل الحالات</h2>
+<ul>
+  {% for h in order.history %}
+    <li>{{ h.created_at.strftime('%Y-%m-%d %H:%M') }} — {{ h.old_status or '—' }} → {{ h.new_status }}{% if h.note %} ({{ h.note }}){% endif %}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

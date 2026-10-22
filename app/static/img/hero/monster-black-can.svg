@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Classic black energy drink can">
+<defs><linearGradient id="body" x1="0" x2="1"><stop stop-color="#090b0a"/><stop offset=".16" stop-color="#222724"/><stop offset=".34" stop-color="#090b0a"/><stop offset=".78" stop-color="#141815"/><stop offset="1" stop-color="#050605"/></linearGradient><linearGradient id="metal" x2="0" y2="1"><stop stop-color="#aeb5b0"/><stop offset=".2" stop-color="#454a47"/><stop offset=".8" stop-color="#171a18"/><stop offset="1" stop-color="#777e78"/></linearGradient><filter id="shadow"><feGaussianBlur stdDeviation="14"/></filter></defs>
+<ellipse cx="200" cy="555" rx="122" ry="22" fill="#000" opacity=".7" filter="url(#shadow)"/>
+<path d="M129 64 142 45h116l13 19 14 36v391l-14 37H129l-14-37V100z" fill="url(#body)" stroke="#333a35" stroke-width="3"/>
+<path d="M142 45h116l-5 20H147zM115 491h170l-13 37H128z" fill="url(#metal)"/>
+<ellipse cx="200" cy="46" rx="58" ry="10" fill="#8d958e"/><ellipse cx="200" cy="47" rx="42" ry="5" fill="#252a26"/>
+<path d="m172 175 14-58 16 32 13-37 12 62-18-25-12 34-11-34z" fill="#a8e637"/><path d="M174 184h53" stroke="#a8e637" stroke-width="3"/>
+<text x="200" y="223" fill="#e9eee9" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="900" letter-spacing="2">MONSTER</text><text x="200" y="242" fill="#a8e637" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="5">ENERGY</text>
+<text x="200" y="338" fill="#d9dedb" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="3">ORIGINAL</text><text x="200" y="359" fill="#929a94" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" letter-spacing="2">ENERGY DRINK</text>
+<path d="M138 90v370" stroke="#fff" stroke-opacity=".1" stroke-width="3"/><path d="M263 88v380" stroke="#000" stroke-opacity=".75" stroke-width="7"/>
+</svg>

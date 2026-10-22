@@ -1,0 +1,31 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}IMPORT DISTRICT — لوحة القيادة{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">مركز العمليات / IMPORT DISTRICT</p><h1>لوحة تحكم المتجر</h1><p class="muted">نظرة مباشرة على المتجر والطلبات والمخزون.</p></div>
+<div class="quick-actions"><a class="btn btn-primary" href="{{ url_for('admin.product_new') }}">＋ إضافة منتج</a><a class="btn btn-ghost" href="{{ url_for('admin.orders_list', status='pending') }}">مراجعة الطلبات الجديدة</a></div></header>
+<section class="stats-grid" aria-label="ملخص المتجر">
+  <div class="stat"><small>طلبات اليوم</small><span>{{ today_count }}</span></div>
+  <div class="stat accent"><small>قيمة طلبات اليوم · جنيه</small><span>{{ '%.2f'|format(today_value) }}</span></div>
+  <div class="stat"><small>بانتظار المعالجة</small><span>{{ pending }}</span></div>
+  <div class="stat"><small>منتجات نشطة</small><span>{{ active_products }}</span></div>
+  <div class="stat {% if low_stock_count %}warning{% endif %}"><small>مخزون منخفض / نافد</small><span>{{ low_stock_count }}</span></div>
+  <div class="stat"><small>طلبات تم تسليمها</small><span>{{ delivered }}</span></div>
+</section>
+<div class="dashboard-grid">
+  <section class="panel"><div class="section-heading"><div><p class="eyebrow">آخر 7 أيام</p><h2>قيمة الطلبات</h2><p class="muted">قيمة الطلبات غير الملغاة، وليست إيراداً محصلاً.</p></div><a href="{{ url_for('admin.analytics') }}">التفاصيل ←</a></div>
+    {% if chart_values|sum > 0 %}
+    <div class="chart" role="img" aria-label="قيمة الطلبات خلال آخر سبعة أيام">
+    {% set chart_max = chart_values|max if chart_values else 0 %}
+    {% for i in range(chart_labels|length) %}<div class="chart-column"><span>{{ '%.0f'|format(chart_values[i]) }}</span><div class="chart-track"><i style="height: {{ (chart_values[i] / chart_max * 100 if chart_max else 0)|round|int }}%"></i></div><small>{{ chart_labels[i] }}</small></div>{% endfor %}
+    </div>
+    {% else %}<p class="empty-note">لا توجد طلبات خلال الأيام السبعة الماضية.</p>{% endif %}
+  </section>
+  <section class="panel"><div class="section-heading"><div><p class="eyebrow">يتطلب الانتباه</p><h2>تنبيهات المخزون</h2></div><a href="{{ url_for('admin.inventory') }}">إدارة المخزون ←</a></div>
+    {% if low_stock %}<ul class="alert-list">{% for p in low_stock %}<li><span class="stock-dot {% if p.stock == 0 %}out{% endif %}"></span><div><strong>{{ p.name }}</strong><small>{% if p.stock == 0 %}نفد المخزون{% else %}متبقي {{ p.stock }}{% endif %}</small></div><a class="btn btn-ghost btn-sm" href="{{ url_for('admin.product_edit', product_id=p.id) }}">تعديل</a></li>{% endfor %}</ul>{% else %}<p class="empty-note">لا توجد تنبيهات مخزون حالياً.</p>{% endif %}
+  </section>
+</div>
+<section class="panel"><div class="section-heading"><div><p class="eyebrow">مركز الطلبات</p><h2>أحدث الطلبات</h2></div><a href="{{ url_for('admin.orders_list') }}">كل الطلبات ←</a></div>
+<div class="table-wrap"><table class="table"><thead><tr><th>رقم الطلب</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead><tbody>
+{% for o in recent_orders %}<tr><td><bdi>#{{ o.reference }}</bdi></td><td>{{ o.customer_name }}</td><td><bdi>{{ '%.2f'|format(o.total) }} EGP</bdi></td><td><span class="status status-{{ o.status }}">{{ o.status_label_ar }}</span></td><td><bdi>{{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</bdi></td><td><a class="btn btn-ghost btn-sm" href="{{ url_for('admin.order_detail', order_id=o.id) }}">التفاصيل</a></td></tr>{% else %}<tr><td colspan="6" class="empty-note">لا توجد طلبات حتى الآن.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

@@ -1,0 +1,32 @@
+/* Animations - ملف إضافي اختياري */
+
+/* Pulse glow على النص النيون في الـ hero */
+@keyframes pulseGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(180, 255, 0, 0.6); }
+  50% { text-shadow: 0 0 40px rgba(180, 255, 0, 0.95), 0 0 60px rgba(180, 255, 0, 0.5); }
+}
+
+.hero-text h1 .neon {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Cart count bounce */
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+.cart-count.updated {
+  animation: bounce 0.4s ease;
+}
+
+/* Fade in للـ body عند التحميل */
+body {
+  animation: pageFadeIn 0.4s ease;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

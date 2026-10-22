@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}تأكيد طريقة الدفع{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container confirmation">
+    <h1>طريقة الدفع قيد التأكيد</h1>
+    <p>لم يتم تفعيل الدفع عند الاستلام بعد. تواصل مع البائع لتأكيد طريقة الدفع والتوصيل قبل إرسال الطلب.</p>
+    <a href="{{ url_for('storefront.contact') }}" class="btn btn-primary">تواصل مع البائع</a>
+    <a href="{{ url_for('cart.view_cart') }}" class="btn btn-ghost">العودة إلى السلة</a>
+  </div>
+</section>
+{% endblock %}

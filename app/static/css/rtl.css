@@ -1,0 +1,4 @@
+/* RTL overrides */
+/* RTL overrides */
+[dir="rtl"] .nav-search input { text-align: right; }
+[dir="rtl"] .badge { inset-inline-start: auto; inset-inline-end: 8px; }

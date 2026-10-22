@@ -1,0 +1,58 @@
+<!-- Shared create/edit product form -->
+{% extends 'admin/base_admin.html' %}
+{% block title %}{{ 'تعديل المنتج' if product else 'إضافة منتج' }}{% endblock %}
+{% block content %}
+<header class="page-heading product-form-heading"><div><p class="eyebrow">IMPORT DISTRICT / CATALOG</p><h1>{{ 'تعديل المنتج' if product else 'إضافة منتج جديد' }}</h1><p class="muted">أدخل معلومات المنتج ومواصفاته وحالته في المتجر.</p></div></header>
+<form method="post" enctype="multipart/form-data" class="product-admin-form">
+  {{ form.hidden_tag() }}
+  {% if form.errors %}<div class="form-error-summary" role="alert"><strong>يرجى مراجعة الحقول التالية:</strong><ul>{% for field_name, errors in form.errors.items() %}{% for error in errors %}<li>{{ form[field_name].label.text }}: {{ error }}</li>{% endfor %}{% endfor %}</ul></div>{% endif %}
+  {{ form.flavor(type="hidden") }}{{ form.flavor_en(type="hidden") }}
+
+  <section class="product-form-section"><header><span class="product-section-index">01</span><div><h2>المعلومات الأساسية</h2><p>الأسماء والهوية الأساسية للمنتج.</p></div></header><div class="product-field-grid cols-2">
+    <label>{{ form.name.label }} {{ form.name(class="input", placeholder="مثال: مشروب طاقة") }}</label>
+    <label>{{ form.name_en.label }} {{ form.name_en(class="input", placeholder="Product name", dir="ltr") }}</label>
+    <label>{{ form.brand.label }} {{ form.brand(class="input", autocomplete="organization") }}</label>
+    <label>{{ form.origin_country.label }} {{ form.origin_country(class="input", placeholder="الولايات المتحدة") }}</label>
+  </div>
+    <div class="flavor-tag-admin"><div class="flavor-tag-admin-heading"><div><strong>وسوم النكهة</strong><small>اختر أكثر من وسم لتمثيل نكهات المنتج.</small></div><span class="flavor-tag-count" data-tag-count>0 محدد</span></div>
+      <div class="flavor-admin-pills" data-flavor-tag-list>{% for tag in flavor_tags %}<label class="flavor-admin-chip"><input type="checkbox" name="tag_ids" value="{{ tag.id }}" {% if tag.id in selected_tag_ids %}checked{% endif %}><span>{{ tag.name_ar }}<small>{{ tag.name_en }}</small></span></label>{% endfor %}<p class="muted flavor-tag-empty" data-tag-empty {% if flavor_tags %}hidden{% endif %}>لا توجد وسوم بعد. أضف أول وسم من هنا.</p></div>
+      <div class="flavor-tag-quick-add" data-flavor-tag-quick-add data-url="{{ url_for('admin.portal_flavor_tag_quick_add') }}"><input class="input" name="name_ar" maxlength="50" placeholder="اسم الوسم بالعربية" aria-label="اسم الوسم بالعربية"><input class="input" name="name_en" maxlength="50" placeholder="Tag name in English" aria-label="اسم الوسم بالإنجليزية" dir="ltr"><button class="btn" type="button" data-add-flavor-tag>+ وسم جديد</button><span class="flavor-tag-feedback" data-tag-feedback role="status" aria-live="polite"></span></div>
+      {% if product and not product.tags and (product.flavor or product.flavor_en) %}<small class="muted">النكهة القديمة: {{ product.flavor or product.flavor_en }} — اختر الوسوم المقابلة لتحديثها.</small>{% endif %}
+    </div>
+  </section>
+
+  <section class="product-form-section"><header><span class="product-section-index">02</span><div><h2>المواصفات والتسعير</h2><p>تفاصيل العبوة والسعر والمخزون.</p></div></header><div class="product-field-grid cols-3">
+    <label>{{ form.volume.label }} {{ form.volume(class="input", placeholder="500 ml") }}</label>
+    <label>{{ form.calories.label }} {{ form.calories(class="input", placeholder="180 سعرة") }}</label>
+    <label>{{ form.serving_advice.label }} {{ form.serving_advice(class="input", placeholder="يُقدّم مثلجاً") }}</label>
+    <label>{{ form.price.label }} {{ form.price(class="input", placeholder="0.00", inputmode="decimal") }}</label>
+    <label>{{ form.stock.label }} {{ form.stock(class="input", min="0") }}</label>
+    <label>{{ form.low_stock_threshold.label }} {{ form.low_stock_threshold(class="input", min="0") }}</label>
+  </div></section>
+
+  <section class="product-form-section"><header><span class="product-section-index">03</span><div><h2>التصنيف والوسائط</h2><p>اختر الفئة وأضف صورة ووصفاً مناسباً.</p></div></header>
+    <div class="category-field"><label for="category_id">{{ form.category_id.label.text }}</label><div class="product-category-row">{{ form.category_id(class="input", id="category_id", **{'data-category-select': ''}) }}<button type="button" class="btn product-category-add" data-open-category-modal>+ قسم جديد</button><a class="product-category-manage" href="{{ url_for('admin.portal_categories') }}">⚙ إدارة الأقسام</a></div></div>
+    <div class="product-upload-row"><label class="product-upload-zone" for="product-image"><input id="product-image" type="file" name="image" accept="image/png,image/jpeg,image/webp" data-image-preview="#image-preview"><span class="upload-icon" aria-hidden="true">↑</span><strong>اسحب الصورة إلى هنا أو اضغط للاختيار</strong><small>PNG أو JPG أو WebP · الحد الأقصى 4 MB</small></label><div class="product-preview-wrap"><span>معاينة الصورة</span>{% if product and product.image_url %}<img class="image-preview" id="image-preview" src="{{ url_for('static', filename=product.image_url) }}" alt="معاينة صورة المنتج" loading="lazy" decoding="async">{% else %}<img class="image-preview" id="image-preview" alt="معاينة صورة المنتج" hidden>{% endif %}</div></div>
+    <div class="product-field-grid cols-2 description-grid"><label>{{ form.description.label }} {{ form.description(class="input", rows=5, placeholder="اكتب وصف المنتج باللغة العربية") }}</label><label>{{ form.description_en.label }} {{ form.description_en(class="input", rows=5, placeholder="Describe the product", dir="ltr") }}</label></div>
+  </section>
+
+  <section class="product-form-section product-state-section"><header><span class="product-section-index">04</span><div><h2>خيارات وحالة المنتج</h2><p>اختر الشارات وحالة الظهور للمنتج.</p></div></header><div class="product-toggle-row">
+    <label class="product-toggle-card">{{ form.is_featured(class="form-check-input") }}<span class="toggle-icon" aria-hidden="true">✦</span><span><strong>مميّز</strong><small>إبراز المنتج في المتجر</small></span></label>
+    <label class="product-toggle-card">{{ form.is_active(class="form-check-input") }}<span class="toggle-icon" aria-hidden="true">●</span><span><strong>مفعّل</strong><small>إظهار المنتج للعملاء</small></span></label>
+    <label class="product-toggle-card">{{ form.is_zero_sugar(class="form-check-input") }}<span class="toggle-icon" aria-hidden="true">⚡</span><span><strong>خالي من السكر</strong><small>Zero Sugar</small></span></label>
+  </div></section>
+
+  <div class="product-form-actions"><a href="{{ url_for('admin.portal_products_list') }}" class="btn product-cancel-button">إلغاء / رجوع</a><button type="submit" class="btn product-save-button">{{ 'حفظ التعديلات' if product else 'إضافة المنتج' }}</button></div>
+</form>
+
+<div class="category-modal-backdrop" data-category-modal hidden><section class="category-modal" role="dialog" aria-modal="true" aria-labelledby="category-modal-title"><button type="button" class="category-modal-close" data-close-category-modal aria-label="إغلاق">×</button><h2 id="category-modal-title">إضافة قسم جديد</h2><p class="muted">سيظهر القسم مباشرةً ضمن خيارات المنتج.</p><form data-category-quick-add action="{{ url_for('admin.portal_category_quick_add') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>اسم القسم بالعربي<input class="input" name="name_ar" maxlength="80" required></label><label>Category Name (EN)<input class="input" name="name_en" maxlength="80" dir="ltr"></label><p class="category-modal-feedback" role="status" aria-live="polite"></p><div class="category-modal-actions"><button type="button" class="btn btn-ghost" data-close-category-modal>إلغاء</button><button type="submit" class="btn btn-primary">إضافة القسم</button></div></form></section></div>
+<script>
+document.querySelector('[data-image-preview]')?.addEventListener('change', (event) => {
+  const file = event.currentTarget.files?.[0];
+  const preview = document.querySelector(event.currentTarget.dataset.imagePreview);
+  if (!file || !preview || !file.type.startsWith('image/')) return;
+  preview.src = URL.createObjectURL(file);
+  preview.hidden = false;
+});
+</script>
+{% endblock %}

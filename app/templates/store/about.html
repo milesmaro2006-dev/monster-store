@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'About Us' if current_lang == 'en' else 'من نحن' }} — IMPORT DISTRICT{% endblock %}
+{% block meta_description %}{{ 'Our promise of authentic imported favorites, recent expiry dates, and flexible delivery.' if current_lang == 'en' else 'تعرف على وعد Import District بالأصالة والجودة والتوصيل المرن.' }}{% endblock %}
+{% block content %}
+<section class="section about-page"><div class="container">
+  <header class="about-hero"><p class="eyebrow">IMPORT DISTRICT / OUR STORY</p><h1>Import District <span>— بوابتك إلى ما لا يتكرر</span></h1><p>{{ 'منتجات مستوردة مختارة بعناية، تصل إليك بأصالتها وجودتها ومن دون تعقيد.' if current_lang == 'ar' else 'Carefully selected imports, delivered with authenticity, quality, and ease.' }}</p><a href="{{ url_for('storefront.catalog') }}" class="btn btn-primary">{{ 'اكتشف المنتجات' if current_lang == 'ar' else 'Explore products' }}</a></header>
+  <div class="about-pillars"><article class="about-pillar"><span class="about-pillar-number">01</span><h2>أصالة مضمونة 100%</h2><p>جميع المشروبات والسناكس مستوردة مباشرة من مصادرها الرسمية في أمريكا وأوروبا واليابان.</p></article><article class="about-pillar"><span class="about-pillar-number">02</span><h2>تواريخ صلاحية حديثة</h2><p>فحص دوري دقيق لضمان أطول فترة صلاحية وأعلى جودة تخزين وتبريد.</p></article><article class="about-pillar"><span class="about-pillar-number">03</span><h2>توصيل مرن وسريع</h2><p>خيارات استلام مريحة تشمل أقرب محطة مترو أو التوصيل المباشر لباب المنزل.</p></article></div>
+</div></section>
+{% endblock %}

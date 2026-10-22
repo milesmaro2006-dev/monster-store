@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ t('order_received') }} — IMPORT DISTRICT{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="section"><div class="container confirmation" data-whatsapp-url="{{ whatsapp_url }}">
+  <h1>{{ t('order_received') }}</h1>
+  <p>{{ t('order_number') }}: <b class="neon">{{ order.reference }}</b></p>
+  {% if whatsapp_url %}<p>{{ t('order_whatsapp_intro') }}</p>{% endif %}
+  <h2>{{ t('order_summary') }}</h2>
+  <ul class="order-items">{% for it in order.items %}<li>{{ it.name_en_snapshot if current_lang == 'en' and it.name_en_snapshot else it.product_name }}{% if it.brand_snapshot %} · {{ it.brand_snapshot }}{% endif %} × {{ it.quantity }} = {{ '%.2f'|format(it.line_total) }} {{ t('egp') }}</li>{% endfor %}</ul>
+  <p>{{ t('selected_delivery') }}: <b>{{ t('metro_short') if order.delivery_method == 'metro_pickup' else t('home_short') }}</b></p>
+  <p>{{ t('selected_payment') }}: <b>{{ t('cash_on_delivery') if order.payment_method == 'cod' else t('instapay') if order.payment_method == 'instapay' else t('vodafone_cash') }}</b></p>
+  {% if order.payment_method == 'instapay' %}
+  {% if store_settings and (store_settings.instapay_address or store_settings.instapay_name or store_settings.payment_instructions) %}
+  <section class="panel instapay-payment-details" aria-labelledby="instapay-details-title">
+    <h2 id="instapay-details-title">بيانات التحويل عبر إنستاباي</h2>
+    {% if store_settings.instapay_address %}<p>عنوان إنستاباي (IPA): <bdi dir="ltr"><strong>{{ store_settings.instapay_address }}</strong></bdi></p>{% endif %}
+    {% if store_settings.instapay_name %}<p>اسم صاحب الحساب: <strong>{{ store_settings.instapay_name }}</strong></p>{% endif %}
+    {% if store_settings.payment_instructions %}<p>{{ store_settings.payment_instructions }}</p>{% endif %}
+  </section>
+  {% endif %}
+  {% if instapay_whatsapp_url %}<p><a href="{{ instapay_whatsapp_url }}" class="btn btn-primary confirmation-whatsapp" target="_blank" rel="noopener noreferrer">تأكيد الدفع عبر واتساب</a></p>{% endif %}
+  {% endif %}
+  <p>{{ t('shipping_fee') }}: <b>{{ '%.2f'|format(order.delivery_fee) }} {{ t('egp') }}</b></p>
+  <p>{{ t('line_total') }}: <b>{{ '%.2f'|format(order.total) }} {{ t('egp') }}</b></p>
+  {% if whatsapp_url %}<p class="whatsapp-countdown" role="status" aria-live="polite">
+    <span>{{ t('whatsapp_redirect_countdown') }}</span>
+    <b data-whatsapp-countdown>2</b>
+  </p>
+  <p class="muted">{{ t('whatsapp_popup_note') }}</p>
+  <p><a href="{{ whatsapp_url }}" class="btn btn-primary confirmation-whatsapp" target="_blank" rel="noopener noreferrer">إرسال وتأكيد الطلب عبر واتساب (اضغط هنا إذا لم يتم التحويل تلقائياً)</a></p>{% endif %}
+  <a href="{{ url_for('storefront.catalog') }}" class="btn btn-ghost">{{ t('continue_shopping') }}</a>
+</div></section>
+{% endblock %}
+{% block scripts %}
+<script>
+  (() => {
+    const confirmation = document.querySelector('[data-whatsapp-url]');
+    if (!confirmation) return;
+    const whatsappUrl = confirmation.dataset.whatsappUrl;
+    if (!/^https:\/\/wa\.me\/[0-9]+\?text=/.test(whatsappUrl)) return;
+    const counter = confirmation.querySelector('[data-whatsapp-countdown]');
+    let remaining = 2;
+    const interval = window.setInterval(() => {
+      remaining -= 1;
+      if (counter) counter.textContent = String(Math.max(remaining, 0));
+      if (remaining <= 0) window.clearInterval(interval);
+    }, 1000);
+    window.setTimeout(() => window.location.assign(whatsappUrl), 2000);
+  })();
+</script>
+{% endblock %}

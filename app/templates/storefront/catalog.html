@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{{ t('all_products') }} — IMPORT DISTRICT{% endblock %}
+{% block content %}
+<section class="section"><div class="container catalog-page">
+  <h1 class="section-title">{{ t('all_products') }}</h1>
+
+  <div class="catalog-quick-row">
+    <form method="get" action="{{ url_for('storefront.catalog') }}" class="catalog-search-form" role="search">
+      <label class="sr-only" for="catalog-search">{{ t('search') }}</label>
+      <input id="catalog-search" type="search" name="q" value="{{ q }}" placeholder="{{ 'Search drinks and flavors (Monster, Starbucks, Boba...)' if current_lang == 'en' else 'ابحث عن مشروبك أو نكهتك المفضلة (مثل: مونستر، ستاربكس، بوبا...)' }}" autocomplete="off">
+      <button type="submit" aria-label="{{ 'Search' if current_lang == 'en' else 'ابحث' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
+    </form>
+    <nav class="catalog-quick-filters" aria-label="{{ 'Quick filters' if current_lang == 'en' else 'فلاتر سريعة' }}">
+      <a class="filter-pill zero-sugar-filter {% if zero_sugar_only %}is-active{% endif %}" href="{{ url_for('storefront.catalog') if zero_sugar_only else url_for('storefront.catalog', zero_sugar='1') }}" aria-pressed="{{ 'true' if zero_sugar_only else 'false' }}">⚡ {{ 'Show all products' if zero_sugar_only and current_lang == 'en' else 'Zero Sugar only' if current_lang == 'en' else 'عرض كل منتجات زيرو سكر' if zero_sugar_only else 'زيرو سكر فقط' }}</a>
+      <a class="filter-pill {% if selected_sort == 'popular' %}is-active{% endif %}" href="{{ url_for('storefront.catalog') if selected_sort == 'popular' else url_for('storefront.catalog', sort='popular') }}">🔥 {{ 'Most popular' if current_lang == 'en' else 'الأكثر طلباً' }}</a>
+      <a class="filter-pill {% if featured_only %}is-active{% endif %}" href="{{ url_for('storefront.catalog') if featured_only else url_for('storefront.catalog', featured='1') }}">✨ {{ 'Featured' if current_lang == 'en' else 'المميّز' }}</a>
+    </nav>
+  </div>
+
+  <form method="get" action="{{ url_for('storefront.catalog') }}" class="catalog-filter-form">
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+    {% if zero_sugar_only %}<input type="hidden" name="zero_sugar" value="1">{% endif %}
+    {% if featured_only %}<input type="hidden" name="featured" value="1">{% endif %}
+    {% if selected_tag_slugs|length > 1 %}<input type="hidden" name="tags" value="{{ selected_tag_slugs|join(',') }}">{% endif %}
+    <label class="sr-only" for="filter-cat">{{ t('category') }}</label>
+    <select id="filter-cat" name="category"><option value="">{{ t('all_categories') }}</option>{% for c in categories %}<option value="{{ c.slug }}" {{ 'selected' if c.slug == selected_category }}>{{ c.name_en if current_lang == 'en' and c.name_en else c.name_ar }}</option>{% endfor %}</select>
+    <label class="sr-only" for="filter-flavor-tag">{{ 'Flavor tags' if current_lang == 'en' else 'النكهات' }}</label>
+    <select id="filter-flavor-tag" name="flavor_tag"><option value="">{{ 'All flavors' if current_lang == 'en' else 'كل النكهات' }}</option>{% for tag in flavor_tags %}<option value="{{ tag.slug }}" title="{{ tag.name_en if current_lang == 'en' else tag.name_ar }}" {{ 'selected' if tag.slug in selected_tag_slugs or tag.id|string in selected_tag_slugs }}>{{ tag.name_en if current_lang == 'en' else tag.name_ar }}</option>{% endfor %}</select>
+    {% if brands %}<label class="sr-only" for="filter-brand">{{ t('brand') }}</label><select id="filter-brand" name="brand"><option value="">{{ t('all_brands') }}</option>{% for item in brands %}<option value="{{ item }}" {{ 'selected' if item == selected_brand }}>{{ item }}</option>{% endfor %}</select>{% endif %}
+    <details class="catalog-price-filter"><summary>{{ 'Price range' if current_lang == 'en' else 'نطاق السعر' }}</summary><div><input type="number" name="min_price" min="0" step="0.01" value="{{ min_price }}" placeholder="{{ t('minimum_price') }}" aria-label="{{ t('minimum_price') }}"><input type="number" name="max_price" min="0" step="0.01" value="{{ max_price }}" placeholder="{{ t('maximum_price') }}" aria-label="{{ t('maximum_price') }}"></div></details>
+    <label class="sr-only" for="filter-sort">{{ t('sort') }}</label>
+    <select id="filter-sort" name="sort"><option value="newest" {{ 'selected' if selected_sort == 'newest' }}>{{ t('newest') }}</option><option value="price_asc" {{ 'selected' if selected_sort == 'price_asc' }}>{{ t('price_low') }}</option><option value="price_desc" {{ 'selected' if selected_sort == 'price_desc' }}>{{ t('price_high') }}</option><option value="popular" {{ 'selected' if selected_sort == 'popular' }}>{{ t('popular') }}</option></select>
+    <button type="submit" class="btn btn-primary catalog-filter-submit">{{ t('filter') }}</button><a class="catalog-reset" href="{{ url_for('storefront.catalog') }}">{{ 'Reset filters' if current_lang == 'en' else 'إعادة ضبط الفلاتر' }}</a>
+  </form>
+
+  {% if products %}<div class="product-grid">{% for p in products %}{% include 'storefront/_product_card.html' %}{% endfor %}</div>
+    {% if pagination and pagination.pages > 1 %}<nav class="pagination" aria-label="{{ t('all_products') }}">
+      {% if pagination.has_prev %}<a class="btn btn-ghost btn-sm" href="{{ url_for('storefront.catalog', page=pagination.prev_num, q=q, category=selected_category, tags=selected_tag_slugs|join(','), brand=selected_brand, sort=selected_sort, zero_sugar='1' if zero_sugar_only else None, featured='1' if featured_only else None) }}">{{ t('previous') }}</a>{% endif %}<span>{{ t('page_of') }} {{ pagination.page }} {{ 'of' if current_lang == 'en' else 'من' }} {{ pagination.pages }}</span>{% if pagination.has_next %}<a class="btn btn-ghost btn-sm" href="{{ url_for('storefront.catalog', page=pagination.next_num, q=q, category=selected_category, tags=selected_tag_slugs|join(','), brand=selected_brand, sort=selected_sort, zero_sugar='1' if zero_sugar_only else None, featured='1' if featured_only else None) }}">{{ t('next') }}</a>{% endif %}
+    </nav>{% endif %}
+  {% elif catalog_total == 0 %}<p class="empty">{{ t('empty_products') }}</p>{% else %}<p class="empty">{{ t('no_matching_products') }} <a href="{{ url_for('storefront.catalog') }}">{{ t('show_all_products') }}</a>.</p>{% endif %}
+</div></section>
+{% endblock %}

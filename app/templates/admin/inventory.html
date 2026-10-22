@@ -1,0 +1,16 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}المخزون{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">INVENTORY / QUICK UPDATE</p><h1>إدارة المخزون</h1><p class="muted">حدّث الكمية وحد التنبيه مباشرة. المنتجات النافدة والمنخفضة تظهر أولاً.</p></div><a class="btn btn-primary" href="{{ url_for('admin.products_list') }}">كل المنتجات</a></header>
+<section class="panel"><div class="table-wrap"><table class="table inventory-table"><thead><tr><th>المنتج</th><th>الكمية المتاحة</th><th>حد التنبيه</th><th>الحالة</th><th>حفظ</th></tr></thead><tbody>
+{% for p in products %}{% set form_id = 'inventory-update-' ~ p.id %}<tr>
+  <td><strong>{{ p.name }}</strong>{% if p.name_en %}<br><bdi class="muted">{{ p.name_en }}</bdi>{% endif %}
+    <form id="{{ form_id }}" class="inventory-update-form" method="post" action="{{ url_for('admin.inventory_update', product_id=p.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>
+  </td>
+  <td><label class="sr-only" for="stock-{{ p.id }}">الكمية المتاحة — {{ p.name }}</label><input id="stock-{{ p.id }}" form="{{ form_id }}" class="input" type="number" name="stock" min="0" step="1" value="{{ p.stock }}" required></td>
+  <td><label class="sr-only" for="threshold-{{ p.id }}">حد التنبيه — {{ p.name }}</label><input id="threshold-{{ p.id }}" form="{{ form_id }}" class="input" type="number" name="low_stock_threshold" min="0" step="1" value="{{ p.low_stock_threshold }}" required></td>
+  <td><span class="status {{ 'status-cancelled' if p.stock == 0 else ('status-pending' if p.is_low_stock else 'status-delivered') }}">{% if p.stock == 0 %}نافد{% elif p.is_low_stock %}منخفض{% else %}متوفر{% endif %}</span></td>
+  <td><button form="{{ form_id }}" class="btn btn-primary btn-sm inventory-save" type="submit">حفظ</button></td>
+</tr>{% else %}<tr><td colspan="5" class="empty-note">لا توجد منتجات نشطة.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

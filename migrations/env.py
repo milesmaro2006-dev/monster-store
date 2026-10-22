@@ -1,0 +1,51 @@
+"""Alembic environment configured through Flask-Migrate."""
+
+from alembic import context
+from flask import current_app
+
+
+config = context.config
+
+
+def get_engine():
+    return current_app.extensions["migrate"].db.engine
+
+
+def get_engine_url():
+    return get_engine().url.render_as_string(hide_password=False).replace("%", "%%")
+
+
+def get_metadata():
+    return current_app.extensions["migrate"].db.metadata
+
+
+def run_migrations_offline():
+    url = get_engine_url()
+    context.configure(
+        url=url,
+        target_metadata=get_metadata(),
+        literal_binds=True,
+        compare_type=True,
+        render_as_batch=url.startswith("sqlite:"),
+    )
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online():
+    connectable = get_engine()
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=get_metadata(),
+            compare_type=True,
+            render_as_batch=connection.dialect.name == "sqlite",
+        )
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

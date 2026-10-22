@@ -1,0 +1,13 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}تعديل فئة{% endblock %}
+{% block content %}
+<header class="page-heading"><div><p class="eyebrow">IMPORT DISTRICT / CATALOG</p><h1>تعديل الفئة</h1><p class="muted">تحديث الاسمين سيحدّث رابط الفئة تلقائياً.</p></div><a class="btn btn-ghost" href="{{ url_for('admin.portal_categories') }}">العودة للفئات</a></header>
+<form method="post" class="form-grid category-edit-form">
+  {{ form.hidden_tag() }}
+  {% if form.errors %}<div class="form-error-summary" role="alert"><strong>يرجى مراجعة الحقول التالية:</strong><ul>{% for field_name, errors in form.errors.items() %}{% for error in errors %}<li>{{ form[field_name].label.text }}: {{ error }}</li>{% endfor %}{% endfor %}</ul></div>{% endif %}
+  <label>{{ form.name.label }} {{ form.name(class="input", maxlength="80") }}</label>
+  <label>{{ form.name_en.label }} {{ form.name_en(class="input", maxlength="80", dir="ltr") }}</label>
+  <label>{{ form.is_active() }} {{ form.is_active.label }}</label>
+  <div class="category-edit-actions"><button class="btn btn-primary" type="submit">حفظ التعديلات</button><a class="btn btn-ghost" href="{{ url_for('admin.portal_categories') }}">إلغاء</a></div>
+</form>
+{% endblock %}

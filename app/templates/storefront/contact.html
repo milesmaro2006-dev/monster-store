@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ t('contact_us') }} — IMPORT DISTRICT{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container contact-page">
+    <h1 class="section-title">{{ t('contact_us') }}</h1>
+    <p>{{ t('contact_page_copy') }}</p>
+    <p class="muted">{{ t('direct_whatsapp_note') }}</p>
+    <div class="features-grid">
+      {% if contact_whatsapp_url %}<div class="feature">
+        <h2>{{ t('whatsapp') }}</h2>
+        <p><a href="{{ contact_whatsapp_url }}" rel="noopener noreferrer" dir="ltr">{{ contact_whatsapp }}</a></p>
+      </div>{% endif %}
+      {% if contact_phone %}
+      <div class="feature">
+        <h2>{{ t('phone') }}</h2>
+        <p><a href="tel:{{ contact_phone }}">{{ contact_phone }}</a></p>
+      </div>
+      {% endif %}
+      {% if contact_email %}
+      <div class="feature">
+        <h2>{{ t('email') }}</h2>
+        <p><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+      </div>
+      {% endif %}
+      {% if contact_address %}
+      <div class="feature">
+        <h2>{{ t('address') }}</h2>
+        <p>{{ contact_address }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% if not contact_phone and not contact_whatsapp_url and not contact_email and not contact_address %}
+      <p class="empty">{{ t('contact_none') }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

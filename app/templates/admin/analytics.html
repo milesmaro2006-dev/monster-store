@@ -1,0 +1,47 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}تحليلات المتجر{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <div><p class="eyebrow">PRODUCT & DELIVERY MIX / 14 DAYS</p><h1>تحليلات المتجر</h1>
+    <p class="muted">المنتجات الأكثر مبيعاً وتوزيع طرق التوصيل خلال آخر 14 يوماً.</p>
+  </div>
+  <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">العودة للوحة القيادة</a>
+</header>
+<section class="stats-grid" aria-label="ملخص الفترة">
+  <div class="stat"><small>طلبات غير ملغاة</small><span>{{ period_total }}</span></div>
+  <div class="stat"><small>طلبات قيد الانتظار الآن</small><span>{{ pending }}</span></div>
+  <div class="stat"><small>طلبات تم تسليمها</small><span>{{ delivered }}</span></div>
+</section>
+<div class="dashboard-grid">
+  <section class="panel">
+    <div class="section-heading"><div><p class="eyebrow">TOP SELLING FLAVORS</p><h2>الأكثر مبيعاً حسب النكهة</h2></div></div>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>المنتج / النكهة</th><th>الوحدات المباعة</th><th>قيمة المبيعات</th></tr></thead>
+      <tbody>{% for product in top_products %}<tr>
+        <td>{{ product.product_name }}</td><td>{{ product.units_sold }}</td>
+        <td><bdi>{{ '%.2f'|format(product.revenue or 0) }} EGP</bdi></td>
+      </tr>{% else %}<tr><td colspan="3" class="empty-note">لا توجد مبيعات خلال آخر 14 يوماً.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </section>
+  <section class="panel">
+    <div class="section-heading"><div><p class="eyebrow">DELIVERY MIX</p><h2>توزيع طرق التوصيل</h2></div></div>
+    {% if delivery_total %}
+      {% set metro_count = delivery_counts.get('metro_pickup', 0) %}
+      {% set home_count = delivery_counts.get('home_delivery', 0) %}
+      <div class="delivery-mix">
+        <div class="delivery-mix-row"><div><strong>استلام من محطة مترو</strong><bdi>{{ metro_count }} طلب</bdi></div>
+          <div class="delivery-track"><i style="width:{{ (metro_count / delivery_total * 100)|round|int }}%"></i></div>
+          <small>{{ (metro_count / delivery_total * 100)|round|int }}% من الطلبات</small>
+        </div>
+        <div class="delivery-mix-row"><div><strong>توصيل للمنزل</strong><bdi>{{ home_count }} طلب</bdi></div>
+          <div class="delivery-track"><i style="width:{{ (home_count / delivery_total * 100)|round|int }}%"></i></div>
+          <small>{{ (home_count / delivery_total * 100)|round|int }}% من الطلبات</small>
+        </div>
+      </div>
+    {% else %}<p class="empty-note">لا توجد طلبات مكتملة البيانات خلال آخر 14 يوماً.</p>{% endif %}
+  </section>
+</div>
+<section class="panel"><div class="section-heading"><div><p class="eyebrow">ORDER STATES</p><h2>حالات الطلبات الحالية</h2></div></div>
+  <div class="status-summary">{% for status, count in status_counts.items() %}<div><span class="status status-{{ status }}">{{ {'pending':'قيد الانتظار','confirmed':'تم التأكيد','shipped':'تم الشحن','preparing':'قيد التجهيز','out_for_delivery':'تم الشحن','delivered':'تم التسليم','cancelled':'ملغي'}.get(status, status) }}</span><strong>{{ count }}</strong></div>{% else %}<p class="empty-note">لا توجد طلبات مسجلة.</p>{% endfor %}</div>
+</section>
+{% endblock %}

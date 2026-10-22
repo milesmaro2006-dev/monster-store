@@ -1,0 +1,16 @@
+{% if it.kind == 'custom_box' %}
+<article class="cart-item custom-box-cart-item">
+  <div class="cart-item-image"><picture><img src="{{ product_image(it.components[0].product) }}" alt="" width="104" height="104" loading="lazy" data-fallback="{{ placeholder_image }}"></picture></div>
+  <div class="cart-item-name"><h2>بوكس مخصص</h2><ul class="box-cart-components">{% for component in it.components %}<li>{{ component.product|product_name }} × 1</li>{% endfor %}</ul><span class="cart-item-unit">خصم البوكس: {{ '%.2f'|format(it.discount) }} {{ t('egp') }}</span></div>
+  <div class="cart-item-subtotal"><span class="cart-item-label">{{ t('line_total') }}</span><strong>{{ '%.2f'|format(it.line_total) }} {{ t('egp') }}</strong></div>
+  <form action="{{ url_for('cart.remove_box') }}" method="post" class="cart-item-remove"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="remove-item" aria-label="إزالة البوكس">×</button></form>
+</article>
+{% else %}
+<article class="cart-item">
+  <a class="cart-item-image" href="{{ url_for('storefront.product_detail', slug=it.product.slug) }}" tabindex="-1" aria-hidden="true">{% set webp_image = product_image_webp(it.product) %}<picture>{% if webp_image %}<source srcset="{{ webp_image }}" type="image/webp">{% endif %}<img src="{{ product_image(it.product) }}" alt="" width="104" height="104" loading="lazy" decoding="async" data-fallback="{{ placeholder_image }}"></picture></a>
+  <div class="cart-item-name"><h2><a href="{{ url_for('storefront.product_detail', slug=it.product.slug) }}">{{ it.product|product_name }}</a></h2><span class="cart-item-unit">{{ '%.2f'|format(it.unit_price) }} {{ t('egp') }} / {{ t('quantity') }}</span></div>
+  <div class="cart-item-quantity"><span class="cart-item-label">{{ t('quantity') }}</span><form action="{{ url_for('cart.update', product_id=it.product.id) }}" method="post" class="quantity-form" data-quantity-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" name="qty" value="{{ it.qty - 1 }}" class="quantity-step" aria-label="{{ t('decrease_quantity') }}" {% if it.qty <= 1 %}disabled{% endif %}>−</button><output class="quantity-value">{{ it.qty }}</output><button type="submit" name="qty" value="{{ it.qty + 1 }}" class="quantity-step" aria-label="{{ t('increase_quantity') }}" {% if it.qty >= it.product.stock or it.qty >= max_cart_qty %}disabled{% endif %}>+</button></form></div>
+  <div class="cart-item-subtotal"><span class="cart-item-label">{{ t('line_total') }}</span><strong>{{ '%.2f'|format(it.line_total) }} {{ t('egp') }}</strong></div>
+  <form action="{{ url_for('cart.remove', product_id=it.product.id) }}" method="post" class="cart-item-remove"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="remove-item" aria-label="{{ t('remove_cart_item') }}" title="{{ t('remove_cart_item') }}">×</button></form>
+</article>
+{% endif %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}كوّن بوكسك — IMPORT DISTRICT{% endblock %}
+{% block content %}
+<section class="section"><div class="container box-builder" data-box-builder>
+  <header class="box-builder-heading"><p class="eyebrow">IMPORT DISTRICT / CUSTOM MIX</p><h1>{{ 'كوّن بوكسك الخاص' if current_lang == 'ar' else 'Build your own box' }}</h1><p class="muted">{{ 'اختر 3 منتجات مفضلة لديك واستمتع بخصم 40 ج.م.' if current_lang == 'ar' else 'Choose any 3 favorites and save EGP 40.' }}</p></header>
+  <div class="box-slots" aria-live="polite">{% for slot in range(3) %}<div class="box-slot" data-box-slot="{{ slot }}"><span>خانة {{ slot + 1 }}</span><span class="box-slot-empty">اختر منتجاً</span></div>{% endfor %}</div>
+  <div class="box-price-line"><span>الإجمالي بعد الخصم</span><strong data-box-total>—</strong></div>
+  <form method="post" class="box-add-form" data-box-form><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div data-box-inputs></div><button class="btn btn-primary" type="submit" data-box-submit disabled>إضافة البوكس المخصص للسلة (وفرت 40 ج.م)</button></form>
+  <h2 class="section-title">اختر منتجاتك</h2>
+  <div class="product-grid box-product-grid">{% for product in products %}<article class="product-card box-product" data-box-product data-id="{{ product.id }}" data-name="{{ product|product_name }}" data-price="{{ '%.2f'|format(product.price) }}" data-stock="{{ product.stock }}" data-image="{{ product_image(product) }}">
+    <a class="product-card-image" href="{{ url_for('storefront.product_detail', slug=product.slug) }}"><img src="{{ product_image(product) }}" alt="{{ product|product_name }}" loading="lazy" decoding="async" data-fallback="{{ placeholder_image }}"></a><div class="product-card-body"><h3>{{ product|product_name }}</h3><p class="product-price">{{ '%.2f'|format(product.price) }} {{ t('egp') }}</p><button type="button" class="btn btn-secondary" data-box-add>+ أضف للبوكس</button></div>
+  </article>{% else %}<p class="empty-state">لا توجد منتجات متاحة حالياً.</p>{% endfor %}</div>
+</div></section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/box-builder.js', v='20261021-1') }}" defer></script>{% endblock %}

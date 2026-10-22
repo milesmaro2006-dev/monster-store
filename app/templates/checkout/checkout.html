@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ t('checkout_title') }} — IMPORT DISTRICT{% endblock %}
+{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="section"><div class="container checkout-page">
+  <h1 class="section-title">{{ t('delivery_details') }}</h1>
+  <div class="checkout-grid">
+    <form method="post" class="checkout-form" id="checkout-form" novalidate data-checkout-form>
+      {{ form.hidden_tag() }}
+      <div class="checkout-card">
+        <h2>{{ t('delivery_details') }}</h2><p class="muted">{{ t('checkout_intro') }}</p>
+        <div class="checkout-fields checkout-contact-fields">
+          <label>{{ form.customer_name.label }} {{ form.customer_name(class="input", autocomplete="name") }}{% for e in form.customer_name.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+          <label>{{ form.phone.label }} {{ form.phone(class="input", autocomplete="tel", dir="ltr") }}{% for e in form.phone.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+        </div>
+        <fieldset class="delivery-options"><legend>{{ form.delivery_method.label.text }}</legend>
+          <div class="delivery-toggle">{% for choice in form.delivery_method %}<label class="option-label">{{ choice() }}<span>{{ choice.label.text }}<small>{% if choice.data == 'metro_pickup' %}{{ '%.2f'|format(metro_delivery_fee) }} {{ t('egp') }}{% else %}{{ '%.2f'|format(home_delivery_fee) }} {{ t('egp') }}{% endif %}</small></span></label>{% endfor %}</div>
+          {% for e in form.delivery_method.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </fieldset>
+        <div class="delivery-fields" data-delivery-fields="metro_pickup" aria-hidden="{{ 'false' if form.delivery_method.data == 'metro_pickup' else 'true' }}" {% if form.delivery_method.data != 'metro_pickup' %}hidden{% endif %}>
+          <div class="checkout-fields"><label>{{ form.station_name.label }} {{ form.station_name(class="input", autocomplete="off") }}{% for e in form.station_name.errors %}<span class="err">{{ e }}</span>{% endfor %}</label></div>
+        </div>
+        <div class="delivery-fields" data-delivery-fields="home_delivery" aria-hidden="{{ 'true' if form.delivery_method.data == 'metro_pickup' else 'false' }}" {% if form.delivery_method.data == 'metro_pickup' %}hidden{% endif %}>
+          <div class="checkout-fields">
+            <label>{{ form.governorate.label }} {{ form.governorate(class="input") }}{% for e in form.governorate.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+            <label>{{ form.area.label }} {{ form.area(class="input") }}{% for e in form.area.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+            <label class="field-wide">{{ form.street_address.label }} {{ form.street_address(class="input", autocomplete="street-address") }}{% for e in form.street_address.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+            <label>{{ form.building.label }} {{ form.building(class="input") }}{% for e in form.building.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+            <label>{{ form.apartment.label }} {{ form.apartment(class="input") }}{% for e in form.apartment.errors %}<span class="err">{{ e }}</span>{% endfor %}</label>
+          </div>
+        </div>
+        <fieldset class="payment-options"><legend>{{ form.payment_method.label.text }}</legend>
+          <div class="payment-card-grid">{% for choice in form.payment_method %}{% if choice.data != 'vodafone_cash' %}<label class="payment-card">{{ choice() }}<span class="payment-card-copy">{% if choice.data == 'cod' %}الدفع عند الاستلام (كاش){% elif choice.data == 'instapay' %}تحويل إنستاباي / محفظة إلكترونية (InstaPay / Wallet){% else %}بطاقة بنكية (رابط دفع سريع عبر واتساب){% endif %}</span></label>{% endif %}{% endfor %}</div>
+          {% for e in form.payment_method.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          <div class="payment-info" data-payment-info="instapay" {% if form.payment_method.data != 'instapay' %}hidden{% endif %}><p>حساب إنستاباي: <bdi>importdistrict@instapay</bdi> <button type="button" class="copy-payment" data-copy="importdistrict@instapay">نسخ</button></p><p>رقم المحفظة (فودافون كاش): <bdi>010xxxxxxxx</bdi> <button type="button" class="copy-payment" data-copy="010xxxxxxxx">نسخ</button></p><p>يرجى إرسال لقطة شاشة (سكرين شوت) للتحويل في رسالة الواتساب لتأكيد الطلب فوراً.</p></div>
+          <div class="payment-info" data-payment-info="visa_link" {% if form.payment_method.data != 'visa_link' %}hidden{% endif %}>سيتم إرسال رابط دفع إلكتروني آمن لك عبر الواتساب لتأكيد الطلب قبل خروج الشحنة.</div>
+        </fieldset>
+        <div class="checkout-fields checkout-extra-fields">
+          <label>{{ form.notes.label }} {{ form.notes(class="input", rows=2) }}</label>
+        </div>
+        <p class="cod-note">{{ t('payment_confirmed_later') }}</p>
+      </div>
+    </form>
+    <aside class="order-preview checkout-card" data-cart-summary
+           data-metro-fee="{{ '%.2f'|format(metro_delivery_fee) }}"
+           data-home-fee="{{ '%.2f'|format(home_delivery_fee) }}">
+      <h2>{{ t('order_summary') }}</h2>
+      <div class="checkout-preview-items">{% for it in items %}<div class="preview-row">
+        <div class="preview-product">{% if it.kind == 'custom_box' %}{% set preview_product = it.components[0].product %}{% else %}{% set preview_product = it.product %}{% endif %}{% set webp_image = product_image_webp(preview_product) %}<picture>{% if webp_image %}<source srcset="{{ webp_image }}" type="image/webp">{% endif %}<img src="{{ product_image(preview_product) }}" alt="" width="64" height="64" loading="lazy" decoding="async" data-fallback="{{ placeholder_image }}"></picture><span>{% if it.kind == 'custom_box' %}بوكس مخصص{% else %}{{ it.product|product_name }}{% endif %}<small>{% if it.kind == 'custom_box' %}{% for component in it.components %}{{ component.product|product_name }}{% if not loop.last %}، {% endif %}{% endfor %}{% else %}{{ t('quantity') }}: {{ it.qty }}{% endif %}</small></span></div>
+        <bdi>{{ '%.2f'|format(it.line_total) }} {{ t('egp') }}</bdi>
+      </div>{% endfor %}</div>
+      <hr><p><span>{{ t('subtotal') }}</span><b data-subtotal="{{ '%.2f'|format(subtotal) }}">{{ '%.2f'|format(subtotal) }} {{ t('egp') }}</b></p>
+      <p><span>{{ t('shipping_fee') }}</span><b data-shipping-fee>{{ '%.2f'|format(delivery_fee) }} {{ t('egp') }}</b></p>
+      <p class="total"><span>{{ t('line_total') }}</span><b data-total aria-live="polite">{{ '%.2f'|format(total) }} {{ t('egp') }}</b></p>
+      <button type="submit" form="checkout-form" class="btn btn-primary btn-block checkout-submit" data-submit-once>{{ 'تأكيد الطلب وفتح واتساب' if current_lang == 'ar' else 'Confirm order and open WhatsApp' }}</button>
+    </aside>
+  </div>
+</div></section>
+{% endblock %}
